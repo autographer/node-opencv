@@ -1,5 +1,6 @@
 #include "ImgProc.h"
 #include "Matrix.h"
+#include <opencv2/gpu/gpu.hpp>
 
 void ImgProc::Init(Handle<Object> target) {
   Persistent<Object> inner;
@@ -9,6 +10,7 @@ void ImgProc::Init(Handle<Object> target) {
   NODE_SET_METHOD(obj, "undistort", Undistort);
   NODE_SET_METHOD(obj, "initUndistortRectifyMap", InitUndistortRectifyMap);
   NODE_SET_METHOD(obj, "remap", Remap);
+  NODE_SET_METHOD(obj, "resize", Resize);
 
   target->Set(NanNew("imgproc"), obj);
 }
@@ -152,6 +154,53 @@ NAN_METHOD(ImgProc::Remap) {
     // Return the image
     NanReturnValue(outMatrixWrap);
   } catch (cv::Exception &e) {
+    const char *err_msg = e.what();
+    NanThrowError(err_msg);
+    NanReturnUndefined();
+  }
+}
+
+NAN_METHOD(ImgProc::Resize) {
+  NanEscapableScope();
+
+  try {
+    Matrix *m0 = ObjectWrap::Unwrap<Matrix>(args[0]->ToObject());
+    cv::Mat img = m0->mat;
+
+    int width = args[1]->IntegerValue();
+    int height = args[2]->IntegerValue();
+    int method = args[3]->IntegerValue();
+
+    Local<Object> outMatrixWrap = NanNew(Matrix::constructor)->GetFunction()->NewInstance();
+    Matrix *outMatrix = ObjectWrap::Unwrap<Matrix>(outMatrixWrap);
+
+    if(method == 0 || cv::gpu::getCudaEnabledDeviceCount() == 0) {
+      cv::Mat dst;      
+      cv::resize(img, dst, cv::Size(width, height), 0, 0, cv::INTER_CUBIC);
+      outMatrix->mat = dst;
+
+    } else if(method == 1) {
+      if(cv::gpu::CudaMem::canMapHostMemory()) {
+        cv::gpu::GpuMat dst;
+        cv::gpu::CudaMem src(img, cv::gpu::CudaMem::ALLOC_ZEROCOPY);
+        cv::gpu::resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_CUBIC);
+        cv::Mat dst_host(dst);
+        outMatrix->mat = dst_host;
+
+      } else {
+        cv::gpu::GpuMat dst, src;
+        src.upload(img);
+        cv::gpu::resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_CUBIC);
+        cv::Mat dst_host(dst);
+        outMatrix->mat = dst_host;
+      }
+    } else {
+      throw("unknown resize method");
+    }
+
+    NanReturnValue(outMatrixWrap);
+    
+  } catch(cv::Exception &e) {
     const char *err_msg = e.what();
     NanThrowError(err_msg);
     NanReturnUndefined();
