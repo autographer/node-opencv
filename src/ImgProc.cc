@@ -199,10 +199,12 @@ NAN_METHOD(ImgProc::Resize) {
     }
 
     NanReturnValue(outMatrixWrap);
-    
+
   } catch(cv::Exception &e) {
     const char *err_msg = e.what();
     NanThrowError(err_msg);
     NanReturnUndefined();
   }
 }
+
+

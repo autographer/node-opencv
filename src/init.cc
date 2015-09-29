@@ -14,6 +14,7 @@
 #include "ImgProc.h"
 #include "Stereo.h"
 #include "BackgroundSubtractor.h"
+#include "VideoProc.h"
 
 extern "C" void init(Handle<Object> target) {
   NanScope();
@@ -32,6 +33,7 @@ extern "C" void init(Handle<Object> target) {
   StereoBM::Init(target);
   StereoSGBM::Init(target);
   StereoGC::Init(target);
+  VideoProc::Init(target);
 
 #if CV_MAJOR_VERSION >= 2 && CV_MINOR_VERSION >=4
   BackgroundSubtractorWrap::Init(target);
