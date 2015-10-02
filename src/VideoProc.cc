@@ -4,25 +4,25 @@
 #include <opencv2/gpu/gpu.hpp>
 
 void VideoProc::Init(Handle<Object> target) {
-  Persistent<Object> inner;
-  Local<Object> obj = NanNew<Object>();
-  NanAssignPersistent(inner, obj);
+  Nan::Persistent<Object> inner;
+  Local<Object> obj = Nan::New<Object>();
+  inner.Reset( obj);
 
-  NODE_SET_METHOD(obj, "resizeVideo", ResizeVideo);
+  Nan::SetMethod(obj, "resizeVideo", ResizeVideo);
 
-  target->Set(NanNew("videoproc"), obj);
+  target->Set(Nan::New("videoproc").ToLocalChecked(), obj);
 }
 
 NAN_METHOD(VideoProc::ResizeVideo) {
-  NanEscapableScope();
+  Nan::EscapableHandleScope scope;
 
   try {
-    NanAsciiString in_filename(args[0]);
-    NanAsciiString out_filename(args[1]);
+    Nan::Utf8String in_filename(info[0]);
+    Nan::Utf8String out_filename(info[1]);
 
-    int width = args[2]->IntegerValue();
-    int height = args[3]->IntegerValue();
-    int method = args[4]->IntegerValue();
+    int width = info[2]->IntegerValue();
+    int height = info[3]->IntegerValue();
+    int method = info[4]->IntegerValue();
 
     cv::VideoCapture in_vid(*in_filename);
 
@@ -73,7 +73,7 @@ NAN_METHOD(VideoProc::ResizeVideo) {
 
   } catch(cv::Exception &e) {
     const char *err_msg = e.what();
-    NanThrowError(err_msg);
-    NanReturnUndefined();
+    Nan::ThrowError(err_msg);
+    return;
   }
 }

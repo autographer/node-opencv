@@ -6,7 +6,7 @@
 /**
  * Implementation of imgproc.hpp functions
  */
-class VideoProc: public node::ObjectWrap {
+class VideoProc: public Nan::ObjectWrap {
 public:
   static void Init(Handle<Object> target);
   static NAN_METHOD(ResizeVideo);

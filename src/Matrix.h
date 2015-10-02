@@ -1,10 +1,10 @@
 #include "OpenCV.h"
 
-class Matrix: public node::ObjectWrap {
+class Matrix: public Nan::ObjectWrap {
 public:
 
   cv::Mat mat;
-  static Persistent<FunctionTemplate> constructor;
+  static Nan::Persistent<FunctionTemplate> constructor;
   static void Init(Handle<Object> target);
   static NAN_METHOD(New);
   Matrix();
