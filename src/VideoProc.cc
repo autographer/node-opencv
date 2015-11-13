@@ -63,11 +63,11 @@ NAN_METHOD(VideoProc::ResizeVideo) {
               out_vid.write(dst_host);
             }
           } else {
-            throw("unknown resize method");
+              throw cv::Exception(CV_StsInternal, "unknown resize method", "ResizeVideo", __FILE__, __LINE__);
           }
         }
       } else {
-        throw('input video could not opened');
+          throw cv::Exception(CV_StsInternal, "input video could not opened", "ResizeVideo", __FILE__, __LINE__);
       }
     }
 

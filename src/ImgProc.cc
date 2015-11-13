@@ -195,7 +195,7 @@ NAN_METHOD(ImgProc::Resize) {
         outMatrix->mat = dst_host;
       }
     } else {
-      throw("unknown resize method");
+        throw cv::Exception(CV_StsInternal, "unknown resize method", "Resize", __FILE__, __LINE__);
     }
 
     info.GetReturnValue().Set(outMatrixWrap);
