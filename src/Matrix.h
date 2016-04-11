@@ -44,6 +44,7 @@ public:
   JSFUNC(FillPoly)
 
   JSFUNC(Save)
+  JSFUNC(SaveWithExif)
   JSFUNC(SaveAsync)
 
   JSFUNC(ToBuffer)

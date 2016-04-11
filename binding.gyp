@@ -20,7 +20,8 @@
         "src/Calib3D.cc",
         "src/ImgProc.cc",
         "src/Stereo.cc",
-        "src/VideoProc.cc"
+        "src/VideoProc.cc",
+        "src/Utils.cc"
       ],
 
       "libraries": [

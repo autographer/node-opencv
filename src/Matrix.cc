@@ -2,6 +2,8 @@
 #include "Matrix.h"
 #include "OpenCV.h"
 #include <nan.h>
+#include <vector>
+#include "exifparser.h"
 
 Nan::Persistent<FunctionTemplate> Matrix::constructor;
 
@@ -44,6 +46,7 @@ void Matrix::Init(Handle<Object> target) {
   Nan::SetPrototypeMethod(ctor, "fillPoly", FillPoly);
   Nan::SetPrototypeMethod(ctor, "save", Save);
   Nan::SetPrototypeMethod(ctor, "saveAsync", SaveAsync);
+  Nan::SetPrototypeMethod(ctor, "copyExif", CopyExif);
   Nan::SetPrototypeMethod(ctor, "resize", Resize);
   Nan::SetPrototypeMethod(ctor, "rotate", Rotate);
   Nan::SetPrototypeMethod(ctor, "copyTo", CopyTo);
