@@ -29,5 +29,6 @@ NAN_METHOD(ExifUtils::CopyExif) {
   Nan::Utf8String in_filename(info[0]);
   Nan::Utf8String out_filename(info[1]);
 
-  exif::ExifParser::CopyExifData(*in_filename, *out_filename);
+  exif::ExifParser parser;
+  parser.CopyExifData(*in_filename, *out_filename);
 }
