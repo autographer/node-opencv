@@ -6,7 +6,7 @@
 /**
  * Implementation of imgproc.hpp functions
  */
-class Utils : public Nan::ObjectWrap {
+class ExifUtils : public Nan::ObjectWrap {
 public:
   static void Init(Handle<Object> target);
   static NAN_METHOD(CopyExif);

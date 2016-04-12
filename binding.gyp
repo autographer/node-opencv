@@ -21,7 +21,7 @@
         "src/ImgProc.cc",
         "src/Stereo.cc",
         "src/VideoProc.cc",
-        "src/Utils.cc"
+        "src/ExifUtils.cc"
       ],
 
       "libraries": [
