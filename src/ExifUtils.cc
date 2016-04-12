@@ -16,7 +16,7 @@ void ExifUtils::Init(Handle<Object> target) {
 }
 
 NAN_METHOD(ExifUtils::CopyExif) {
-  SETUP_FUNCTION(ExifUtils)
+  Nan::HandleScope scope;
 
   if (!info[0]->IsString()) {
     Nan::ThrowTypeError("filename required");
