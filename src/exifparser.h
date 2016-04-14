@@ -16,7 +16,7 @@
 
 #include <stdint.h>
 
-namespace exif
+namespace visorutils
 {
 class ExifParser
 {
@@ -964,18 +964,18 @@ public:
     
     if(ReadFile(src, buf))
     {
-      size_t start, end;
-      if (ParseExifSize(buf, start, end))
+      size_t start, size;
+      if (ParseExifSize(buf, start, size))
       {
         if(ReadFile(dest, destbuf))
         {
           std::vector<uint8_t> out;
 
-          for (size_t n = 0; n < start; n++) {
-            out.push_back(buf[n]);
-          }
-          for (size_t n = start; n < end; n++) {
-            out.push_back(buf[n]);
+          out.push_back(0xFF);
+          out.push_back(0xD8);
+
+          for (size_t n = 0; n < size; n++) {
+            out.push_back(buf[n+start]);
           }
           for (size_t n = 2; n < destbuf.size(); n++) {
             out.push_back(destbuf[n]);
@@ -993,7 +993,9 @@ public:
     return success;
   }
 
-  bool ParseExifSize(const std::vector<uint8_t>& buffer, size_t& offs, size_t& section_length)
+  bool ParseExifSize(const std::vector<uint8_t>& buffer, 
+                     size_t& section_start, 
+                     size_t& section_length)
   {
     // Sanity check: all JPEG files start with 0xFFD8 and end with 0xFFD9
     // This check also ensures that the user has supplied a correct value for len.
@@ -1022,7 +1024,7 @@ public:
     //   4 bytes: Offset to first IFD
     // =========
     //  16 bytes
-    offs = 0;        // current offset into buffer
+    size_t offs = 0;        // current offset into buffer
     for (offs = 0; offs < size - 1; offs++)
     {
       if (IsEXIF(&buffer[offs]))
@@ -1035,21 +1037,19 @@ public:
       return false;
     }
     
+    section_start = offs;
+
     // step over marker
     offs += 2;
     // extract tag length -always BE (Motorola format)
     section_length = parse16(&buffer[0] + offs, false);
-    // compensate for the 2 bytes for the EXIF marker
-    section_length += 2;
-    //
-    //DBMSG2("EXIF at offset " << section_start << " length " << section_length);
-    //
+
     if (offs + section_length > size || section_length < 16)
     {
       return false;
     }
-    // step over field length
-    offs += 2;
+
+    section_length += 2; // 0xFFE1 (size excludes marker but includes size bytes)
 
     return true;
   }
@@ -1069,7 +1069,8 @@ public:
     }
 
 		// extract EXIF elements
-    bool ret = (parseFromEXIFSegment(&buffer[section_start], size - section_start) == PARSE_EXIF_SUCCESS);
+    uint32_t off = section_start + 4; // 4 is the offset to ExifHeader start
+    bool ret = (parseFromEXIFSegment(&buffer[off], size - off) == PARSE_EXIF_SUCCESS);
 		// sanity check
 
 		uint8_t magic = buffer[section_start + section_length];
