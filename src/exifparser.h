@@ -16,7 +16,7 @@
 
 #include <stdint.h>
 
-namespace visorutils
+namespace exif
 {
 class ExifParser
 {
