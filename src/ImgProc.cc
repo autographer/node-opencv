@@ -215,6 +215,10 @@ NAN_METHOD(ImgProc::Rotate) {
     Local<Object> resultWrap = Nan::New(Matrix::constructor)->GetFunction()->NewInstance();
     Matrix *result = Nan::ObjectWrap::Unwrap<Matrix>(resultWrap);
 
+    Matrix *m0 = Nan::ObjectWrap::Unwrap<Matrix>(info[0]->ToObject());
+    cv::Mat img = m0->mat;
+    int angle = info[1]->IntegerValue();
+
     if(angle == 90) {
       cv::transpose(img, result->mat);  
       flip(result->mat, result->mat, 1);
