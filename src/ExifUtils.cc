@@ -34,7 +34,7 @@ NAN_METHOD(ExifUtils::CopyExif) {
   parser.CopyExifData(*in_filename, *out_filename);
 }
 
-NAN_METHOD(OpenCV::ReadRotation) {
+NAN_METHOD(ExifUtils::ReadRotation) {
   Nan::EscapableHandleScope scope;
 
   if (!info[0]->IsString()) {
