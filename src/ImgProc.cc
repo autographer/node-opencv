@@ -11,6 +11,7 @@ void ImgProc::Init(Handle<Object> target) {
   Nan::SetMethod(obj, "initUndistortRectifyMap", InitUndistortRectifyMap);
   Nan::SetMethod(obj, "remap", Remap);
   Nan::SetMethod(obj, "resize", Resize);
+  Nan::SetMethod(obj, "rotate", Rotate);
 
   target->Set(Nan::New("imgproc").ToLocalChecked(), obj);
 }
@@ -199,6 +200,37 @@ NAN_METHOD(ImgProc::Resize) {
     }
 
     info.GetReturnValue().Set(outMatrixWrap);
+
+  } catch(cv::Exception &e) {
+    const char *err_msg = e.what();
+    Nan::ThrowError(err_msg);
+    return;
+  }
+}
+
+NAN_METHOD(ImgProc::Rotate) {
+  Nan::EscapableHandleScope scope;
+
+  try {
+    Local<Object> resultWrap = Nan::New(Matrix::constructor)->GetFunction()->NewInstance();
+    Matrix *result = Nan::ObjectWrap::Unwrap<Matrix>(resultWrap);
+
+    if(angle == 90) {
+      cv::transpose(img, result->mat);  
+      flip(result->mat, result->mat, 1);
+    } 
+    else if(angle == -90) {
+      cv::transpose(img, result->mat);  
+      cv::flip(result->mat, result->mat, 0); //transpose+flip(0)=CCW     
+    } 
+    else if(angle == 180) {
+      cv::flip(img, result->mat, -1);    //flip(-1)=180          
+    } 
+    else {
+      Nan::ThrowError("Angle not supported");
+    }
+
+    info.GetReturnValue().Set(resultWrap);
 
   } catch(cv::Exception &e) {
     const char *err_msg = e.what();

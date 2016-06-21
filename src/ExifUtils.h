@@ -10,6 +10,7 @@ class ExifUtils : public Nan::ObjectWrap {
 public:
   static void Init(Handle<Object> target);
   static NAN_METHOD(CopyExif);
+  static NAN_METHOD(ReadRotation);
 };
 
 #endif

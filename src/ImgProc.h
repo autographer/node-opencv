@@ -13,6 +13,7 @@ public:
   static NAN_METHOD(InitUndistortRectifyMap);
   static NAN_METHOD(Remap);
   static NAN_METHOD(Resize);
+  static NAN_METHOD(Rotate);
 };
 
 #endif
