@@ -47,7 +47,7 @@ NAN_METHOD(ExifUtils::ReadRotation) {
     exif::ExifParser parser;
     
     if(parser.ParseExifData(*in_filename)) {
-      const exif::ExifParser::ExifInfo& imgexif = GetExifInfo();
+      const exif::ExifParser::ExifInfo& imgexif = parser.GetExifInfo();
       info.GetReturnValue().Set(Nan::New<Number>((int)imgexif.Orientation));
     } else {
       info.GetReturnValue().Set(Nan::New<Number>((int)exif::ExifParser::UNKNOWN_ORIENTATION));
