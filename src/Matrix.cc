@@ -871,16 +871,21 @@ NAN_METHOD(Matrix::FillPoly) {
 NAN_METHOD(Matrix::Save) {
   SETUP_FUNCTION(Matrix)
 
-  if (info.Length() > 1) {
-    return SaveAsync(info);
-  }
-
   if (!info[0]->IsString()) {
     Nan::ThrowTypeError("filename required");
   }
 
+  int compression = 95;
+  if(info[1]->IsInt32()) {
+    compression = info[1]->IntegerValue();
+  }
+
   Nan::Utf8String filename(info[0]);
-  int res = cv::imwrite(*filename, self->mat);
+  std::vector<int> params;
+  params.push_back(CV_IMWRITE_JPEG_QUALITY);
+  params.push_back(compression);
+
+  int res = cv::imwrite(*filename, self->mat, params);
 
   info.GetReturnValue().Set(Nan::New<Number>(res));
 }
@@ -889,10 +894,11 @@ NAN_METHOD(Matrix::Save) {
 // https://github.com/rvagg/nan/blob/c579ae858ae3208d7e702e8400042ba9d48fa64b/examples/async_pi_estimate/async.cc
 class AsyncSaveWorker: public Nan::AsyncWorker {
 public:
-  AsyncSaveWorker(Nan::Callback *callback, Matrix* matrix, char* filename) :
+  AsyncSaveWorker(Nan::Callback *callback, Matrix* matrix, char* filename, int compression=95) :
       Nan::AsyncWorker(callback),
       matrix(matrix),
-      filename(filename) {
+      filename(filename),
+      compression(compression) {
   }
 
   ~AsyncSaveWorker() {
@@ -903,7 +909,10 @@ public:
   // here, so everything we need for input and output
   // should go on `this`.
   void Execute() {
-    res = cv::imwrite(this->filename, this->matrix->mat);
+    std::vector<int> params;
+    params.push_back(CV_IMWRITE_JPEG_QUALITY);
+    params.push_back(compression);
+    res = cv::imwrite(this->filename, this->matrix->mat, params);
   }
 
   // Executed when the async work is complete
@@ -928,6 +937,7 @@ private:
   Matrix* matrix;
   char* filename;
   int res;
+  int compression;
 };
 
 NAN_METHOD(Matrix::SaveAsync) {
@@ -941,8 +951,13 @@ NAN_METHOD(Matrix::SaveAsync) {
 
   REQ_FUN_ARG(1, cb);
 
+  int compression = 95;
+  if(info[1]->IsInt32()) {
+    compression = info[1]->IntegerValue();
+  }
+
   Nan::Callback *callback = new Nan::Callback(cb.As<Function>());
-  Nan::AsyncQueueWorker(new AsyncSaveWorker(callback, self, *filename));
+  Nan::AsyncQueueWorker(new AsyncSaveWorker(callback, self, *filename, compression));
 
   return;
 }
