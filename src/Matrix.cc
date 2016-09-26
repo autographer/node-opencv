@@ -885,7 +885,15 @@ NAN_METHOD(Matrix::Save) {
   params.push_back(CV_IMWRITE_JPEG_QUALITY);
   params.push_back(compression);
 
-  int res = cv::imwrite(*filename, self->mat, params);
+  int res = 0;
+
+  try {
+    res = cv::imwrite(*filename, self->mat, params);
+  }
+  catch(cv::Exception& e ) {
+    const char* err_msg = e.what();
+    Nan::ThrowError(err_msg);
+  }
 
   info.GetReturnValue().Set(Nan::New<Number>(res));
 }
