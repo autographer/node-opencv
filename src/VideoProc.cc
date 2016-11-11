@@ -67,7 +67,7 @@ NAN_METHOD(VideoProc::ResizeVideo) {
           }
         }
       } else {
-          throw cv::Exception(CV_StsInternal, "input video could not opened", "ResizeVideo", __FILE__, __LINE__);
+          throw cv::Exception(CV_StsInternal, "output video could not opened " + filename, "ResizeVideo", __FILE__, __LINE__);
       }
     }
 
