@@ -29,6 +29,9 @@ NAN_METHOD(VideoProc::ResizeVideo) {
     if(in_vid.isOpened()) {
 
       int fps = in_vid.get(CV_CAP_PROP_FPS);
+      if(std::isnan(fps) || fps <= 0 || fps > 2000) {
+        fps = 25;
+      }
       std::string filename = *out_filename;
       //filename += ".mjpeg";
       cv::VideoWriter out_vid(filename, CV_FOURCC('M','J','P','G'), fps, cv::Size(width,height));
