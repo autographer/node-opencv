@@ -15,7 +15,7 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "node-gyp build",
+    "build": "node-gyp rebuild",
     "test": "node test/unit.js",
     "install": "npm run build"
   },
