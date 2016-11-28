@@ -15,9 +15,8 @@
   },
   "license": "MIT",
   "scripts": {
-    "build": "node-gyp rebuild",
     "test": "node test/unit.js",
-    "install": "npm run build"
+    "install": "node-gyp rebuild"
   },
   "keywords": [
     "opencv",
