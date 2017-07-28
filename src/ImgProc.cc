@@ -176,22 +176,22 @@ NAN_METHOD(ImgProc::Resize) {
     Matrix *outMatrix = Nan::ObjectWrap::Unwrap<Matrix>(outMatrixWrap);
 
     if(method == 0 || cv::gpu::getCudaEnabledDeviceCount() == 0) {
-      cv::Mat dst;      
-      cv::resize(img, dst, cv::Size(width, height), 0, 0, cv::INTER_CUBIC);
+      cv::Mat dst;
+      cv::resize(img, dst, cv::Size(width, height), 0, 0, cv::INTER_AREA);
       outMatrix->mat = dst;
 
     } else if(method == 1) {
       if(cv::gpu::CudaMem::canMapHostMemory()) {
         cv::gpu::GpuMat dst;
         cv::gpu::CudaMem src(img, cv::gpu::CudaMem::ALLOC_ZEROCOPY);
-        cv::gpu::resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_CUBIC);
+        cv::gpu::resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_AREA);
         cv::Mat dst_host(dst);
         outMatrix->mat = dst_host;
 
       } else {
         cv::gpu::GpuMat dst, src;
         src.upload(img);
-        cv::gpu::resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_CUBIC);
+        cv::gpu::resize(src, dst, cv::Size(width, height), 0, 0, cv::INTER_AREA);
         cv::Mat dst_host(dst);
         outMatrix->mat = dst_host;
       }
